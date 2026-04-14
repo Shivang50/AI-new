@@ -1,0 +1,90 @@
+def move_files_to_intermediate_logs():
+
+    try:
+        cwd = Path.cwd()
+
+        intermediate_dir = cwd / "Intermediate_logs"
+        intermediate_dir.mkdir(parents=True, exist_ok=True)
+
+        diff_dir = cwd / "Diff_Logs"
+
+        # Move Diff_Logs folder
+        if diff_dir.exists():
+
+            dst = intermediate_dir / "Diff_Logs"
+
+            if dst.exists():
+                shutil.rmtree(dst)
+
+            shutil.move(str(diff_dir), str(dst))
+
+            print("Moved Diff_Logs to Intermediate_logs")
+
+        items_to_move = [
+            "cds.lib",
+            "cds.lib.task1",
+            "menus",
+            "nominal",
+            "out.log",
+            "replay1.il",
+            "replay.il",
+            "Summary.txt",
+            "topcell.list",
+            "uk-init.il",
+            "XORLIB"
+        ]
+
+        for item in items_to_move:
+
+            src = cwd / item
+            dst = intermediate_dir / item
+
+            if src.exists():
+
+                if dst.exists():
+
+                    if dst.is_dir():
+                        shutil.rmtree(dst)
+                    else:
+                        dst.unlink()
+
+                shutil.move(str(src), str(dst))
+
+                print(f"Moved {item}")
+
+    except Exception as e:
+
+        print("WARNING while moving files:", e)
+
+
+
+
+
+
+  if lines:
+
+    out_text = "\n".join(lines) + "\n"
+    report_log.write_text(out_text)
+
+    diff_lines = read_diff_lines_from_log()
+
+    prompt = build_prompt(diff_lines)
+
+    generate_token_and_call_api(
+        api_key,
+        client_app_name,
+        prompt
+    )
+
+    move_files_to_intermediate_logs()
+
+
+
+
+    except (ValueError, RuntimeError) as e:
+
+    print("\nERROR:", e)
+
+    move_files_to_intermediate_logs()
+
+    sys.exit(1)
