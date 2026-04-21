@@ -1,0 +1,102 @@
+files_payload = {
+    "topcell_diff_report": open(
+        "Cell_Diff/topcell_diff_report.csv",
+        "rb"
+    ),
+    "terminal_diff_report": open(
+        "terminal_diff_report.csv",
+        "rb"
+    )
+}
+
+response = requests.post(
+    url,
+    data={
+        "payload": str(request_body)
+    },
+    files=files_payload,
+    headers={
+        "stchatgpt-auth-token": token,
+        "stchatgpt-auth-nonce": str(nonce)
+    },
+    verify=False,
+    timeout=180
+)
+
+
+for f in files_payload.values():
+    f.close()
+
+
+files_payload = {
+    "topcell_diff_report": open(
+        "Cell_Diff/topcell_diff_report.csv",
+        "rb"
+    ),
+    "terminal_diff_report": open(
+        "terminal_diff_report.csv",
+        "rb"
+    )
+}
+
+try:
+
+    response = requests.post(
+
+        url,
+
+        data={
+            "payload": str(request_body)
+        },
+
+        files=files_payload,
+
+        headers={
+
+            "stchatgpt-auth-token": token,
+
+            "stchatgpt-auth-nonce": str(nonce)
+
+        },
+
+        verify=False,
+
+        timeout=180
+    )
+
+    response.raise_for_status()
+
+    response_json = response.json()
+
+    content = response_json.get(
+        "completion",
+        ""
+    )
+
+finally:
+
+    # THIS is the exact place
+    for f in files_payload.values():
+        f.close()
+
+
+
+with open("Cell_Diff/topcell_diff_report.csv", "rb") as f1, \
+     open("terminal_diff_report.csv", "rb") as f2:
+
+    files_payload = {
+        "topcell_diff_report": f1,
+        "terminal_diff_report": f2
+    }
+
+    response = requests.post(
+        url,
+        data={"payload": str(request_body)},
+        files=files_payload,
+        headers={
+            "stchatgpt-auth-token": token,
+            "stchatgpt-auth-nonce": str(nonce)
+        },
+        verify=False,
+        timeout=180
+    )
