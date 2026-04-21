@@ -1,0 +1,36 @@
+if not content:
+
+    print("\nLLM returned empty response.")
+    print("Retrying once...\n")
+
+    time.sleep(2)
+
+    with open(topcell_csv_path, "rb") as f_topcell_retry, \
+         open(terminal_csv_path, "rb") as f_terminal_retry:
+
+        retry_files_payload = {
+            "topcell_diff_report": (
+                "topcell_diff_report.csv",
+                f_topcell_retry,
+                "text/csv"
+            ),
+            "terminal_diff_report": (
+                "terminal_diff_report.csv",
+                f_terminal_retry,
+                "text/csv"
+            )
+        }
+
+        response = requests.post(
+            url,
+            data={
+                "payload": str(request_body)
+            },
+            files=retry_files_payload,
+            headers={
+                "stchatgpt-auth-token": token,
+                "stchatgpt-auth-nonce": str(nonce)
+            },
+            verify=False,
+            timeout=180
+        )
