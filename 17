@@ -1,0 +1,176 @@
+def save_readable_html_report(content):
+
+    html_file = output_dir / "impacted_view_report_readable.html"
+
+    lines = content.splitlines()
+
+    table_rows = []
+    summary_lines = []
+
+    in_table = False
+    in_summary = False
+
+    # -----------------------------
+    # Parse Markdown response
+    # -----------------------------
+    for line in lines:
+
+        stripped = line.strip()
+
+        if stripped.startswith("| CAD view"):
+            in_table = True
+            continue
+
+        if in_table and stripped.startswith("|---"):
+            continue
+
+        if in_table and stripped.startswith("|"):
+            parts = [
+                p.strip()
+                for p in stripped.split("|")
+                if p.strip()
+            ]
+            table_rows.append(parts)
+            continue
+
+        if "Difference summary" in stripped:
+            in_table = False
+            in_summary = True
+            continue
+
+        if in_summary:
+            if stripped:
+                summary_lines.append(stripped)
+
+    # -----------------------------
+    # Build HTML table rows
+    # -----------------------------
+    table_html = ""
+
+    for i, row in enumerate(table_rows):
+
+        if i == 0:
+            table_html += "<tr>\n"
+            for col in row:
+                table_html += f"<th>{col}</th>\n"
+            table_html += "</tr>\n"
+        else:
+            table_html += "<tr>\n"
+            for col in row:
+                table_html += f"<td>{col}</td>\n"
+            table_html += "</tr>\n"
+
+    # -----------------------------
+    # Build summary list
+    # -----------------------------
+    summary_html = ""
+
+    for line in summary_lines:
+
+        if line.startswith("-"):
+            summary_html += f"<li>{line[1:].strip()}</li>\n"
+        else:
+            summary_html += f"<li>{line}</li>\n"
+
+    # -----------------------------
+    # HTML Template
+    # -----------------------------
+    html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Impacted View Report</title>
+
+<style>
+
+body {{
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 25px;
+}}
+
+h1 {{
+    font-size: 22px;
+}}
+
+table {{
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+}}
+
+th, td {{
+    border: 1px solid #444;
+    padding: 8px;
+    text-align: left;
+    vertical-align: top;
+    word-wrap: break-word;
+}}
+
+th {{
+    background-color: #e6e6e6;
+    font-weight: bold;
+}}
+
+td:nth-child(1) {{
+    width: 220px;
+}}
+
+td:nth-child(2) {{
+    width: 90px;
+    text-align: center;
+}}
+
+td:nth-child(3) {{
+    width: auto;
+}}
+
+ul {{
+    margin-top: 10px;
+}}
+
+li {{
+    margin-bottom: 6px;
+}}
+
+.section-title {{
+    font-size: 20px;
+    margin-top: 30px;
+    font-weight: bold;
+}}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Impacted View Report</h1>
+
+<table>
+{table_html}
+</table>
+
+<div class="section-title">
+Difference summary
+</div>
+
+<ul>
+{summary_html}
+</ul>
+
+</body>
+</html>
+"""
+
+    with open(html_file, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+    print("Saved HTML report:", html_file)
+
+
+save_markdown_table_as_csv(content)
+
+save_readable_text_report(content)
+
+save_readable_html_report(content)
