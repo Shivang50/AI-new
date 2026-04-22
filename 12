@@ -1,0 +1,112 @@
+You are analyzing three reports: a topcell diff report, a terminal diff report, and a layout impact report.
+
+Your task:
+1) Produce exactly one Markdown table with exactly these columns, in this order:
+   CAD view | Impact | Reason
+2) Then add a section titled exactly:
+   Difference summary
+   and include bullets only.
+
+Rules for the table:
+- Use library-level assessment only.
+- Do not include any cell names.
+- Include exactly these CAD views as rows, in this exact order:
+  GDS
+  CDL
+  LEF
+  Liberty
+  Verilog
+  APACHE DEF (PG routing only)
+- Set Impact to Yes if the reports show any relevant layout layer difference or terminal addition/removal affecting that view.
+- Set Impact to No only if the reports provide no evidence that the view is affected.
+- In Reason, cite the exact layers and/or exact terminal names from the reports that justify the decision.
+- If Impact is No, the Reason must be short and explicit, using only the minimal no-change statement needed, such as:
+  - "No terminals added or removed"
+  - "No cells added or removed"
+  - "No terminals added or removed; no cells added or removed"
+  Use only the statements supported by the reports.
+- Use the report data exactly as provided; do not infer unsupported changes.
+-Strictly follow all the guidlines given below:
+- Treat layer names and layer purposes separately:
+  - Layer names are the actual layers, for example: M1, M2, M3.
+  - Layer purposes are the purposes on those layers, for example: drawing, pin, lvsres, HSSOI, NET1V, res3V.
+- When describing layout differences in the Reason column:
+  - Use the format: "layer with purpose <purpose>: <layer list>".
+  - Example: "layer with purpose drawing: M1, M2, M3; layer with purpose pin: M1, M2, M3"
+  - Do not write combined tokens like M1/pin, M2/pin, or M3/pin.
+  - Group all layout differences into one statement, but keep purposes separated from layers.
+  - If multiple purposes are present, list each purpose with its associated layers.
+- When describing terminal changes, group terminal additions/removals by source cell.
+- For multiple terminal cases, use one terminal-change point and use sub-bullets for each source cell.
+- Do not mention any internal assessment process.
+
+Rules for the Difference summary:
+- Use bullets only.
+- Include one bullet for layout differences, grouping all relevant layers and all relevant purposes together.
+- The layout bullet must separate purposes from layers, using wording like:
+  - "layer with purpose ...: ..."
+-  Only include one bullet for terminal additions or removals.
+  - If multiple source cells are affected, use sub-bullets under this bullet.
+- Only include one bullet for topcell differences.
+- If no topcell additions or removals are reported, explicitly say so.
+- Keep the summary concise but technical.
+- Do not include cell names anywhere in the table.
+- Do not add any extra commentary, headings, notes, or explanations.
+
+Input reports:
+1. Topcell diff report as csv content:
+Cells Added,Cells Removed
+,
+Status: No cells added or removed
+
+2. Terminal diff report as csv content:
+Cell Name,Terminals Added,Terminals Removed
+P28_COMPENSATION_1V83V3, , 
+P28_COMPENSATION_1V83V3_50FPF_WBMI_LIN, , 
+P28_FILLCELL_COMP_LS_ASRC_50FPF_LIN, , 
+Status: No terminals added or removed
+
+3. Layout impact report:
+difference on lpp:("BP" "drawing")
+difference on lpp:("CA" "drawing")
+difference on lpp:("EG" "drawing")
+difference on lpp:("GO3" "drawing")
+difference on lpp:("HYBRID" "drawing")
+difference on lpp:("LVT" "drawing")
+difference on lpp:("M1" "drawing")
+difference on lpp:("M1" "pin")
+difference on lpp:("M2" "drawing")
+difference on lpp:("M2" "lvsres")
+difference on lpp:("M2" "pin")
+difference on lpp:("M3" "drawing")
+difference on lpp:("M3" "lvsres")
+difference on lpp:("M3" "pin")
+difference on lpp:("M4" "drawing")
+difference on lpp:("MKR" "HSSOI")
+difference on lpp:("MKR" "NET1V")
+difference on lpp:("MKR" "res3V")
+difference on lpp:("NCAP" "drawing")
+difference on lpp:("NW" "drawing")
+difference on lpp:("OD33" "drawing")
+difference on lpp:("OP" "drawing")
+difference on lpp:("PC" "drawing")
+difference on lpp:("PC" "pin")
+difference on lpp:("PCAP" "drawing")
+difference on lpp:("PRES" "drawing")
+difference on lpp:("RE" "drawing")
+difference on lpp:("RX" "drawing")
+difference on lpp:("RX" "pin")
+difference on lpp:("SXCUT" "drawing")
+difference on lpp:("T3" "drawing")
+difference on lpp:("V1" "drawing")
+difference on lpp:("V2" "drawing")
+difference on lpp:("V3" "drawing")
+difference on lpp:("V4" "drawing")
+difference on lpp:("y0" "drawing")
+
+
+Output requirements:
+- Respond in the same language as the user prompt.
+- Output only the requested Markdown table and the "Difference summary" section.
+- Preserve the exact row order required for the table.
+- If a report contains no changes, explicitly state that in the relevant Reason or bullet.
