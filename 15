@@ -1,0 +1,21 @@
+def save_readable_report(content):
+
+    readable_file = output_dir / "impacted_view_report_readable.md"
+
+    with open(
+        readable_file,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        f.write(content)
+
+    print(
+        "\nSaved human-readable report to:",
+        readable_file
+    )
+
+
+save_readable_report(
+    content
+)
