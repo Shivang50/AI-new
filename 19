@@ -1,0 +1,214 @@
+def save_readable_pdf_report(content):
+
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Table,
+        TableStyle,
+        Paragraph,
+        Spacer,
+        ListFlowable,
+        ListItem
+    )
+
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+
+    pdf_file = output_dir / "impacted_view_report_readable.pdf"
+
+    styles = getSampleStyleSheet()
+
+    elements = []
+
+    title = Paragraph(
+        "Impacted View Report",
+        styles["Title"]
+    )
+
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+
+    lines = content.splitlines()
+
+    table_rows = []
+    summary_lines = []
+
+    in_table = False
+    in_summary = False
+
+    # -----------------------------
+    # Parse Markdown response
+    # -----------------------------
+    for line in lines:
+
+        stripped = line.strip()
+
+        if stripped.startswith("| CAD view"):
+
+            in_table = True
+
+            parts = [
+                p.strip()
+                for p in stripped.split("|")
+                if p.strip()
+            ]
+
+            table_rows.append(parts)
+
+            continue
+
+        if in_table and stripped.startswith("|---"):
+            continue
+
+        if in_table and stripped.startswith("|"):
+
+            parts = [
+                p.strip()
+                for p in stripped.split("|")
+                if p.strip()
+            ]
+
+            table_rows.append(parts)
+
+            continue
+
+        if "Difference summary" in stripped:
+
+            in_table = False
+            in_summary = True
+
+            continue
+
+        if in_summary and stripped:
+
+            summary_lines.append(stripped)
+
+    # -----------------------------
+    # Build Table
+    # -----------------------------
+    table_data = []
+
+    for row in table_rows:
+
+        formatted_row = []
+
+        for cell in row:
+
+            paragraph = Paragraph(
+                cell,
+                styles["BodyText"]
+            )
+
+            formatted_row.append(paragraph)
+
+        table_data.append(formatted_row)
+
+    table = Table(
+        table_data,
+        colWidths=[
+            2.5 * inch,
+            1.0 * inch,
+            4.0 * inch
+        ]
+    )
+
+    table.setStyle(
+
+        TableStyle([
+
+            ("GRID", (0, 0), (-1, -1), 1, colors.black),
+
+            ("BACKGROUND",
+             (0, 0),
+             (-1, 0),
+             colors.lightgrey),
+
+            ("VALIGN",
+             (0, 0),
+             (-1, -1),
+             "TOP"),
+
+            ("LEFTPADDING",
+             (0, 0),
+             (-1, -1),
+             6),
+
+            ("RIGHTPADDING",
+             (0, 0),
+             (-1, -1),
+             6),
+
+            ("TOPPADDING",
+             (0, 0),
+             (-1, -1),
+             4),
+
+            ("BOTTOMPADDING",
+             (0, 0),
+             (-1, -1),
+             4),
+
+        ])
+
+    )
+
+    elements.append(table)
+
+    elements.append(Spacer(1, 20))
+
+    # -----------------------------
+    # Difference summary
+    # -----------------------------
+    summary_title = Paragraph(
+        "Difference summary",
+        styles["Heading2"]
+    )
+
+    elements.append(summary_title)
+
+    elements.append(Spacer(1, 12))
+
+    bullet_items = []
+
+    for line in summary_lines:
+
+        if line.startswith("-"):
+
+            text = line[1:].strip()
+
+        else:
+
+            text = line
+
+        bullet_items.append(
+
+            ListItem(
+                Paragraph(
+                    text,
+                    styles["BodyText"]
+                )
+            )
+
+        )
+
+    bullet_list = ListFlowable(
+        bullet_items,
+        bulletType="bullet"
+    )
+
+    elements.append(bullet_list)
+
+    # -----------------------------
+    # Build PDF
+    # -----------------------------
+    doc = SimpleDocTemplate(
+        str(pdf_file),
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+
+    doc.build(elements)
+
+    print("Saved PDF report:", pdf_file)
