@@ -1,0 +1,77 @@
+def save_readable_text_report(content):
+
+    readable_file = output_dir / "impacted_view_report_readable.txt"
+
+    lines = content.splitlines()
+
+    table_rows = []
+    summary_lines = []
+    in_table = False
+    in_summary = False
+
+    for line in lines:
+
+        if line.strip().startswith("| CAD view"):
+            in_table = True
+            continue
+
+        if in_table and line.strip().startswith("|---"):
+            continue
+
+        if in_table and line.startswith("|"):
+            parts = [
+                p.strip()
+                for p in line.split("|")
+                if p.strip()
+            ]
+            table_rows.append(parts)
+            continue
+
+        if "Difference summary" in line:
+            in_table = False
+            in_summary = True
+            summary_lines.append("\nDifference summary")
+            summary_lines.append("-" * 60)
+            continue
+
+        if in_summary:
+            summary_lines.append(line)
+
+    col_widths = [0, 0, 0]
+
+    for row in table_rows:
+        for i in range(len(row)):
+            col_widths[i] = max(
+                col_widths[i],
+                len(row[i])
+            )
+
+    with open(readable_file, "w", encoding="utf-8") as f:
+
+        header = table_rows[0]
+
+        f.write(
+            f"{header[0]:<{col_widths[0]+2}}"
+            f"{header[1]:<{col_widths[1]+2}}"
+            f"{header[2]}\n"
+        )
+
+        f.write("-" * 70 + "\n")
+
+        for row in table_rows[1:]:
+
+            f.write(
+                f"{row[0]:<{col_widths[0]+2}}"
+                f"{row[1]:<{col_widths[1]+2}}"
+                f"{row[2]}\n"
+            )
+
+        f.write("\n")
+
+        for line in summary_lines:
+            f.write(line + "\n")
+
+    print("Saved readable text report:", readable_file)
+
+
+    save_readable_text_report(content)
