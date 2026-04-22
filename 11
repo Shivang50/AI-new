@@ -1,0 +1,148 @@
+def topcell_comparison(output_csv: Path, comparison_result: dict):
+
+    added_cells = comparison_result["cells_added"]
+    removed_cells = comparison_result["removed"]
+
+    with output_csv.open("w", newline="", encoding="utf-8") as f:
+
+        writer = csv.writer(f)
+
+        # Header
+        writer.writerow([
+            "Cells_Added_wrt_MAT10",
+            "Cells_Removed_wrt_MAT10"
+        ])
+
+        # Data row
+        writer.writerow([
+            " ".join(added_cells) if added_cells else "",
+            " ".join(removed_cells) if removed_cells else ""
+        ])
+
+        # -------------------------
+        # Build Status message
+        # -------------------------
+
+        if added_cells and removed_cells:
+
+            status = (
+                f"Status: "
+                f"{', '.join(added_cells)} cells are added "
+                f"and "
+                f"{', '.join(removed_cells)} "
+                f"{'cell is' if len(removed_cells) == 1 else 'cells are'} removed"
+            )
+
+        elif added_cells:
+
+            status = (
+                f"Status: "
+                f"{', '.join(added_cells)} "
+                f"{'cell is' if len(added_cells) == 1 else 'cells are'} added"
+            )
+
+        elif removed_cells:
+
+            status = (
+                f"Status: "
+                f"{', '.join(removed_cells)} "
+                f"{'cell is' if len(removed_cells) == 1 else 'cells are'} removed"
+            )
+
+        else:
+
+            status = "Status: no cells are added or removed"
+
+        # Write status line
+        writer.writerow([])
+        writer.writerow([status])
+
+    print(f"Topcell comparison report written to: {output_csv}")
+
+
+
+
+
+def write_csv(rows, output_csv: Path):
+
+    status_lines = []
+
+    with output_csv.open("w", newline="", encoding="utf-8") as f:
+
+        writer = csv.writer(f)
+
+        # Header
+        writer.writerow([
+            "Cell Name",
+            "Terminals Added",
+            "Terminals Removed"
+        ])
+
+        any_change = False
+
+        for row in rows:
+
+            cell_name = row[0]
+            added = row[1].strip()
+            removed = row[2].strip()
+
+            # Write original row
+            writer.writerow(row)
+
+            # Build status only if something changed
+            if added or removed:
+
+                any_change = True
+
+                parts = []
+
+                if added:
+
+                    added_terms = added.split()
+
+                    if len(added_terms) == 1:
+                        parts.append(
+                            f"{added_terms[0]} terminal is added"
+                        )
+                    else:
+                        parts.append(
+                            f"{', '.join(added_terms)} terminals are added"
+                        )
+
+                if removed:
+
+                    removed_terms = removed.split()
+
+                    if len(removed_terms) == 1:
+                        parts.append(
+                            f"{removed_terms[0]} terminal is removed"
+                        )
+                    else:
+                        parts.append(
+                            f"{', '.join(removed_terms)} terminals are removed"
+                        )
+
+                status_line = (
+                    f"Status: For cell {cell_name} "
+                    + " and ".join(parts)
+                )
+
+                status_lines.append(status_line)
+
+        # Add blank line before status
+        writer.writerow([])
+
+        # Case 2 — nothing changed in any cell
+        if not any_change:
+
+            writer.writerow(
+                ["Status: No terminals are added or removed"]
+            )
+
+        else:
+
+            for line in status_lines:
+
+                writer.writerow([line])
+
+    print(f"Report written to: {output_csv.resolve()}")
