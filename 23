@@ -1,0 +1,50 @@
+%PDF-1.1
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+
+3 0 obj
+<< /Type /Page
+   /Parent 2 0 R
+   /MediaBox [0 0 612 792]
+   /Contents 4 0 R
+   /Resources <<
+       /Font <<
+           /F1 5 0 R
+       >>
+   >>
+>>
+endobj
+
+4 0 obj
+<< /Length 1547 >>
+stream
+BT /F1 10 Tf 50 750 Td (| CAD view | Impact | Reason |) Tj ETBT /F1 10 Tf 50 736 Td (|---|---|---|) Tj ETBT /F1 10 Tf 50 722 Td (| GDS | Yes | layer with purpose drawing: BP, CA, EG, GO3, HYBRID, LVT, M1, M2, M3, M4, NCAP, NW, OD33, OP, PC, PCAP, PRES, RE, RX, SXCUT, T3, V1, V2, V3, V4, y0; layer with purpose pin: M1, M2, M3, PC, RX; layer with purpose lvsres: M2, M3; layer with purpose HSSOI: MKR; layer with purpose NET1V: MKR; layer with purpose res3V: MKR |) Tj ETBT /F1 10 Tf 50 708 Td (| CDL | No | No terminals added or removed |) Tj ETBT /F1 10 Tf 50 694 Td (| LEF | No | No terminals added or removed |) Tj ETBT /F1 10 Tf 50 680 Td (| Liberty | No | No terminals added or removed |) Tj ETBT /F1 10 Tf 50 666 Td (| Verilog | No | No terminals added or removed |) Tj ETBT /F1 10 Tf 50 652 Td (| APACHE DEF \(PG routing only\) | Yes | layer with purpose drawing: M1, M2, M3, M4, V1, V2, V3, V4 |) Tj ETBT /F1 10 Tf 50 638 Td () Tj ETBT /F1 10 Tf 50 624 Td (Difference summary) Tj ETBT /F1 10 Tf 50 610 Td (- Layout differences: layer with purpose drawing: BP, CA, EG, GO3, HYBRID, LVT, M1, M2, M3, M4, NCAP, NW, OD33, OP, PC, PCAP, PRES, RE, RX, SXCUT, T3, V1, V2, V3, V4, y0; layer with purpose pin: M1, M2, M3, PC, RX; layer with purpose lvsres: M2, M3; layer with purpose HSSOI: MKR; layer with purpose NET1V: MKR; layer with purpose res3V: MKR.) Tj ETBT /F1 10 Tf 50 596 Td (- Terminal additions or removals: no terminals are added or removed.) Tj ETBT /F1 10 Tf 50 582 Td (- Topcell differences: no cells are added or removed.) Tj ET
+endstream
+endobj
+
+5 0 obj
+<< /Type /Font
+   /Subtype /Type1
+   /BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000060 00000 n
+0000000117 00000 n
+0000000277 00000 n
+0000000500 00000 n
+
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+600
+%%EOF
