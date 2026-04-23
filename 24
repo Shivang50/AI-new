@@ -1,0 +1,111 @@
+def save_pdf_without_external_lib(content):
+
+    from pathlib import Path
+    import textwrap
+
+    pdf_file = output_dir / "impacted_view_report_readable.pdf"
+
+    # Page layout
+    page_width = 612
+    page_height = 792
+
+    margin_left = 50
+    margin_top = 750
+    line_height = 14
+    max_chars_per_line = 90
+
+    y_position = margin_top
+
+    text_objects = []
+
+    def add_line(text, y):
+        safe = (
+            text.replace("\\", "\\\\")
+            .replace("(", "\\(")
+            .replace(")", "\\)")
+        )
+        return f"BT /F1 10 Tf {margin_left} {y} Td ({safe}) Tj ET\n"
+
+    for raw_line in content.splitlines():
+
+        if not raw_line.strip():
+            y_position -= line_height
+            continue
+
+        wrapped_lines = textwrap.wrap(
+            raw_line,
+            width=max_chars_per_line
+        )
+
+        for line in wrapped_lines:
+
+            if y_position < 50:
+
+                # new page
+                text_objects.append("%% NEWPAGE\n")
+                y_position = margin_top
+
+            text_objects.append(
+                add_line(line, y_position)
+            )
+
+            y_position -= line_height
+
+    text_stream = "".join(text_objects)
+
+    pdf_content = f"""%PDF-1.1
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+
+3 0 obj
+<< /Type /Page
+   /Parent 2 0 R
+   /MediaBox [0 0 {page_width} {page_height}]
+   /Contents 4 0 R
+   /Resources <<
+       /Font <<
+           /F1 5 0 R
+       >>
+   >>
+>>
+endobj
+
+4 0 obj
+<< /Length {len(text_stream)} >>
+stream
+{text_stream}
+endstream
+endobj
+
+5 0 obj
+<< /Type /Font
+   /Subtype /Type1
+   /BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000060 00000 n
+0000000117 00000 n
+0000000277 00000 n
+0000000500 00000 n
+
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+600
+%%EOF
+"""
+
+    with open(pdf_file, "wb") as f:
+        f.write(pdf_content.encode("latin-1"))
+
+    print("Saved PDF report:", pdf_file)
