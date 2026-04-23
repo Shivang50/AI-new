@@ -1,0 +1,88 @@
+def save_pdf_without_external_lib(content):
+
+    from pathlib import Path
+
+    pdf_file = output_dir / "impacted_view_report_readable.pdf"
+
+    lines = content.splitlines()
+
+    # Basic PDF structure
+    text_lines = []
+
+    y_position = 750
+
+    for line in lines:
+
+        clean_line = line.replace("(", "\\(").replace(")", "\\)")
+
+        text_lines.append(
+            f"BT /F1 10 Tf 50 {y_position} Td ({clean_line}) Tj ET"
+        )
+
+        y_position -= 14
+
+        if y_position < 50:
+
+            break
+
+    pdf_content = f"""%PDF-1.1
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+
+3 0 obj
+<< /Type /Page
+   /Parent 2 0 R
+   /MediaBox [0 0 612 792]
+   /Contents 4 0 R
+   /Resources <<
+       /Font <<
+           /F1 5 0 R
+       >>
+   >>
+>>
+endobj
+
+4 0 obj
+<< /Length {len("".join(text_lines))} >>
+stream
+{"".join(text_lines)}
+endstream
+endobj
+
+5 0 obj
+<< /Type /Font
+   /Subtype /Type1
+   /BaseFont /Helvetica
+>>
+endobj
+
+xref
+0 6
+0000000000 65535 f
+0000000010 00000 n
+0000000060 00000 n
+0000000117 00000 n
+0000000277 00000 n
+0000000500 00000 n
+
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+600
+%%EOF
+"""
+
+    with open(pdf_file, "wb") as f:
+
+        f.write(pdf_content.encode("latin-1"))
+
+    print("Saved PDF report:", pdf_file)
+
+
+
+save_pdf_without_external_lib(content)
