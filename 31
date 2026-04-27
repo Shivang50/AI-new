@@ -1,0 +1,272 @@
+import os
+import glob
+import subprocess
+import sys
+import shutil
+import re
+from pathlib import Path
+import urllib3
+import requests
+import hashlib
+import random
+import time
+import csv
+from typing import Set
+import base64   # NEW IMPORT
+
+# Disable SSL warnings
+urllib3.disable_warnings(
+    urllib3.exceptions.InsecureRequestWarning
+)
+
+
+# prompt
+
+def build_prompt():
+
+    base_prompt = (
+        "Please analyze the attached PDF and provide summary."
+    )
+
+    return base_prompt
+
+
+# Generate token and call API
+
+def generate_token_and_call_api(
+    api_key,
+    client_app_name,
+    prompt
+):
+
+    service_name = "chat"
+
+    url = (
+        "https://api-ai-bridge.st.com/chatgpt/api/client-apps"
+    )
+
+    timestamp = int(time.time())
+
+    nonce = random.randint(
+        100000,
+        999999
+    )
+
+    data = (
+        f"{client_app_name}_"
+        f"{service_name}_"
+        f"{api_key}_"
+        f"{timestamp}_"
+        f"{nonce}"
+    )
+
+    hash_object = hashlib.sha1(
+        data.encode()
+    )
+
+    token = hash_object.hexdigest()
+
+    # ==========================
+    # READ AND ENCODE PDF
+    # ==========================
+
+    pdf_path = "impact_view_report_readable.pdf"
+
+    if not os.path.exists(pdf_path):
+
+        print(
+            "PDF file not found:",
+            pdf_path
+        )
+
+        return
+
+    with open(
+        pdf_path,
+        "rb"
+    ) as pdf_file:
+
+        encoded_bytes = base64.b64encode(
+            pdf_file.read()
+        )
+
+        encoded_string = encoded_bytes.decode(
+            "utf-8"
+        )
+
+        pdf_base64 = (
+            "data:application/pdf;base64,"
+            + encoded_string
+        )
+
+    # ==========================
+    # REQUEST BODY
+    # ==========================
+
+    request_body = {
+
+        "version": 1,
+        "clientAppName": client_app_name,
+        "service": service_name,
+        "timestamp": timestamp,
+
+        "messages": [
+
+            {
+                "role": "user",
+
+                "content": [
+
+                    {
+                        "type": "text",
+                        "content": prompt
+                    },
+
+                    {
+                        "type": "document",
+                        "content": pdf_base64
+                    }
+
+                ]
+            }
+
+        ],
+
+        "temperature": 1,
+        "persona": "st_copilot",
+        "responseFormat": "text"
+    }
+
+    try:
+
+        response = requests.post(
+
+            url,
+
+            json=request_body,
+
+            headers={
+
+                "stchatgpt-auth-token":
+                    token,
+
+                "stchatgpt-auth-nonce":
+                    str(nonce)
+
+            },
+
+            verify=False,
+
+            timeout=180
+        )
+
+        response.raise_for_status()
+
+        response_json = response.json()
+
+        content = response_json.get(
+            "completion",
+            ""
+        )
+
+        # Retry once if empty
+
+        if not content or not content.strip():
+
+            print(
+                "\nLLM returned empty response."
+            )
+
+            print(
+                "Retrying once...\n"
+            )
+
+            time.sleep(2)
+
+            response = requests.post(
+
+                url,
+
+                json=request_body,
+
+                headers={
+
+                    "stchatgpt-auth-token":
+                        token,
+
+                    "stchatgpt-auth-nonce":
+                        str(nonce)
+
+                },
+
+                verify=False,
+
+                timeout=180
+            )
+
+            response.raise_for_status()
+
+            response_json = response.json()
+
+            content = response_json.get(
+                "completion",
+                ""
+            )
+
+            if not content or not content.strip():
+
+                print(
+                    "\nLLM still returned empty response."
+                )
+
+                print(
+                    response_json
+                )
+
+                return
+
+        print(
+            "\nResponse length:",
+            len(content)
+        )
+
+        print(
+            "\nLLM Response:\n"
+        )
+
+        print(
+            content
+        )
+
+    except requests.exceptions.RequestException as error:
+
+        if error.response is not None:
+
+            print(
+                "\nError:",
+                error.response.text
+            )
+
+        else:
+
+            print(
+                "\nError:",
+                error
+            )
+
+
+if __name__ == "__main__":
+
+    api_key = "6a932be7-e056-4d4f-b4a5-78f7459057e2"
+
+    client_app_name = (
+        "gtrd_library_cad_eda_management"
+    )
+
+    prompt = build_prompt()
+
+    generate_token_and_call_api(
+        api_key,
+        client_app_name,
+        prompt
+    )
