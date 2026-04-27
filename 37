@@ -1,0 +1,39 @@
+print(
+    "\nResponse length:",
+    len(content)
+)
+
+print(
+    "\nLLM Response:\n"
+)
+
+print(
+    content
+)
+
+# ==========================
+# SAVE RESPONSE TO .sv FILE
+# ==========================
+
+output_file = "llm_response.sv"
+
+try:
+
+    with open(
+        output_file,
+        "w"
+    ) as f:
+
+        f.write(content)
+
+    print(
+        "\nResponse saved to file:",
+        output_file
+    )
+
+except Exception as e:
+
+    print(
+        "Failed to write response to file:",
+        e
+    )
