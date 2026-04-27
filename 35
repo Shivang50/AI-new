@@ -1,0 +1,55 @@
+import uuid
+
+nonce = str(uuid.uuid4())
+
+
+
+if not content or not content.strip():
+
+    print("\nLLM returned empty response.")
+    print("Retrying once...")
+
+    time.sleep(2)
+
+    # regenerate timestamp
+    timestamp = int(time.time())
+
+    # regenerate nonce
+    nonce = random.randint(
+        100000,
+        999999
+    )
+
+    # recompute token
+    data = (
+        f"{client_app_name}_"
+        f"{service_name}_"
+        f"{api_key}_"
+        f"{timestamp}_"
+        f"{nonce}"
+    )
+
+    token = hashlib.sha1(
+        data.encode()
+    ).hexdigest()
+
+    # update timestamp in request body
+    request_body["timestamp"] = timestamp
+
+    response = requests.post(
+
+        url,
+
+        json=request_body,
+
+        headers={
+
+            "stchatgpt-auth-token": token,
+            "stchatgpt-auth-nonce": str(nonce)
+
+        },
+
+        verify=False,
+
+        timeout=180
+    )
