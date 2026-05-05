@@ -1,0 +1,106 @@
+def convert_csv_to_text(csv_file_path):
+
+    import csv
+
+    rows = []
+
+    with open(csv_file_path, "r") as f:
+
+        reader = csv.DictReader(f)
+
+        for row in reader:
+
+            cad_view = row["CAD view"].strip()
+            impact = row["Impact"].strip()
+
+            rows.append(
+                f"{cad_view}, {impact}"
+            )
+
+    csv_to_text = "\n".join(rows)
+
+    return csv_to_text
+
+
+def gds_action():
+    print("GDS is impacted and the following actions are being triggered.")
+
+
+def cdl_action():
+    print("CDL is impacted and the following actions are being triggered.")
+
+
+def lef_action():
+    print("LEF is impacted and the following actions are being triggered.")
+
+
+def liberty_action():
+    print("Liberty is impacted and the following actions are being triggered.")
+
+
+def verilog_action():
+    print("Verilog is impacted and the following actions are being triggered.")
+
+
+def apache_def_action():
+    print("APACHE DEF is impacted and the following actions are being triggered.")
+
+
+    CAD_VIEW_ACTIONS = {
+    "GDS": gds_action,
+    "CDL": cdl_action,
+    "LEF": lef_action,
+    "Liberty": liberty_action,
+    "Verilog": verilog_action,
+    "APACHE DEF (PG routing only)": apache_def_action,
+}
+
+
+def agent_decision_engine(csv_to_text):
+
+    print("\nAgent started processing...\n")
+
+    lines = csv_to_text.split("\n")
+
+    for line in lines:
+
+        parts = line.split(",")
+
+        if len(parts) != 2:
+            continue
+
+        cad_view = parts[0].strip()
+        impact = parts[1].strip()
+
+        print(
+            f"Checking: {cad_view} → {impact}"
+        )
+
+        if impact.lower() == "yes":
+
+            action_function = CAD_VIEW_ACTIONS.get(
+                cad_view
+            )
+
+            if action_function:
+
+                action_function()
+
+
+def run_agent(csv_file_path):
+
+    csv_to_text = convert_csv_to_text(
+        csv_file_path
+    )
+
+    agent_decision_engine(
+        csv_to_text
+    )
+
+
+if __name__ == "__main__":
+
+    csv_file = "Output/impacted_view_report.csv"
+
+    run_agent(csv_file)
+
