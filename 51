@@ -1,0 +1,30 @@
+def move_terminal_logs_to_intermediate():
+
+    TERMINAL_LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+    for pattern in [f"*{BE_SUFFIX}", f"*{MAT10_SUFFIX}"]:
+
+        for file_path in Path.cwd().glob(pattern):
+
+            destination = TERMINAL_LOG_DIR / file_path.name
+
+            if destination.exists():
+                destination.unlink()
+
+            shutil.move(str(file_path), str(destination))
+
+    print(
+        f"Moved terminal log files to: {TERMINAL_LOG_DIR}"
+    )
+
+
+  pairs = find_cell_pairs(TERMINAL_LOG_DIR)
+
+  output_path = TERMINAL_LOG_DIR / OUTPUT_CSV
+
+  terminal_diff_report_csv_path = (
+    TERMINAL_LOG_DIR / "terminal_diff_report.csv"
+)
+move_terminal_logs_to_intermediate()
+
+pin_checking()
