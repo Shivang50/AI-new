@@ -1,0 +1,36 @@
+def execute_actions(action_list):
+
+    print("\nExecuting actions from LLM...\n")
+
+    VALID_ACTIONS = set(ACTION_MAP.keys())
+
+    filtered_actions = [
+        action_name
+        for action_name in action_list
+        if action_name in VALID_ACTIONS
+    ]
+
+    for action_name in filtered_actions:
+
+        func = ACTION_MAP.get(action_name)
+
+        if func:
+
+            try:
+
+                func()
+
+            except Exception as e:
+
+                print(
+                    f"Error executing {action_name}: {e}"
+                )
+
+        else:
+
+            print(
+                f"Unknown action: {action_name}"
+            )
+
+
+
