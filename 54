@@ -1,0 +1,90 @@
+def convert_csv_to_text(csv_file_path):
+
+    """
+    Read impacted_view_report.csv
+    and convert only:
+    CAD view, Impact
+    into text format for LLM.
+    """
+
+    import csv
+
+    lines = []
+
+    try:
+
+        with open(csv_file_path, "r") as csv_file:
+
+            reader = csv.DictReader(csv_file)
+
+            for row in reader:
+
+                cad_view = row["CAD view"].strip()
+
+                impact = row["Impact"].strip()
+
+                lines.append(
+                    f"{cad_view}, {impact}"
+                )
+
+        csv_to_text = "\n".join(lines)
+
+        print("\nCSV converted to text:\n")
+
+        print(csv_to_text)
+
+        return csv_to_text
+
+    except Exception as e:
+
+        print(
+            "\nError converting CSV to text:",
+            e
+        )
+
+        return ""
+
+
+def gds_action():
+
+    print(
+        "GDS is impacted and the following actions are being triggered."
+    )
+
+
+def cdl_action():
+
+    print(
+        "CDL is impacted and the following actions are being triggered."
+    )
+
+
+def lef_action():
+
+    print(
+        "LEF is impacted and the following actions are being triggered."
+    )
+
+
+def liberty_action():
+
+    print(
+        "Liberty is impacted and the following actions are being triggered."
+    )
+
+
+def verilog_action():
+
+    print(
+        "Verilog is impacted and the following actions are being triggered."
+    )
+
+
+def apache_def_action():
+
+    print(
+        "APACHE DEF is impacted and the following actions are being triggered."
+    )
+
+
+
