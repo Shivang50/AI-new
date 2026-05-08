@@ -1,0 +1,177 @@
+def build_agent_prompt(csv_to_text):
+
+    prompt = f"""
+You are an AI Agent.
+
+Input:
+A list of CAD views with their Impact (Yes/No).
+
+Your task:
+- For each CAD view:
+    - If Impact = Yes → return the function name to trigger
+    - If Impact = No → do nothing
+
+Available functions:
+- gds_action
+- cdl_action
+- lef_action
+- liberty_action
+- verilog_action
+- apache_def_action
+
+Mapping:
+GDS → gds_action
+CDL → cdl_action
+LEF → lef_action
+Liberty → liberty_action
+Verilog → verilog_action
+APACHE DEF (PG routing only) → apache_def_action
+
+Output format STRICTLY:
+Return ONLY function names to call, one per line.
+Do not explain anything.
+
+Example output:
+gds_action
+lef_action
+apache_def_action
+
+Input data:
+{csv_to_text}
+"""
+
+    return prompt
+
+
+
+
+def get_llm_decisions(api_key, client_app_name, csv_to_text):
+
+    prompt = build_agent_prompt(csv_to_text)
+
+    response = generate_token_and_call_api(
+        api_key,
+        client_app_name,
+        prompt
+    )
+
+    return response
+
+
+
+
+def parse_llm_output(response):
+
+    if not response:
+        return []
+
+    lines = response.strip().split("\n")
+
+    actions = []
+
+    for line in lines:
+
+        action = line.strip()
+
+        if action:
+            actions.append(action)
+
+    return actions
+
+
+
+ACTION_MAP = {
+    "gds_action": gds_action,
+    "cdl_action": cdl_action,
+    "lef_action": lef_action,
+    "liberty_action": liberty_action,
+    "verilog_action": verilog_action,
+    "apache_def_action": apache_def_action,
+}
+
+
+
+def execute_actions(action_list):
+
+    print("\nExecuting actions from LLM...\n")
+
+    for action_name in action_list:
+
+        func = ACTION_MAP.get(action_name)
+
+        if func:
+            func()
+        else:
+            print(f"Unknown action: {action_name}")
+
+
+
+
+def run_llm_agent(csv_file_path, api_key, client_app_name):
+
+    csv_to_text = convert_csv_to_text(csv_file_path)
+
+    print("\nCSV Sent to LLM:\n", csv_to_text)
+
+    response = get_llm_decisions(
+        api_key,
+        client_app_name,
+        csv_to_text
+    )
+
+    actions = parse_llm_output(response)
+
+    print("\nLLM decided actions:\n", actions)
+
+    execute_actions(actions)
+
+
+
+
+VALID_ACTIONS = set(ACTION_MAP.keys())
+
+actions = [
+    action
+    for action in actions
+    if action in VALID_ACTIONS
+]
+
+print("\nLLM Response:\n")
+print(response)
+
+
+try:
+    func()
+except Exception as e:
+    print(f"Error executing {action_name}: {e}")
+
+
+
+
+if __name__ == "__main__":
+
+    api_key = "xxxx"
+
+    client_app_name = "xxxx"
+
+    csv_file_path = "Output/impacted_view_report.csv"
+
+    run_llm_agent(
+        csv_file_path,
+        api_key,
+        client_app_name
+    )
+
+
+
+import requests
+import hashlib
+import random
+import time
+import csv
+import urllib3
+
+urllib3.disable_warnings(
+    urllib3.exceptions.InsecureRequestWarning
+)
+
